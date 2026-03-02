@@ -10,6 +10,7 @@ Developed with Icotera i4850-31 but expected to work with other variants. Refere
 
 * configure ip4 port forwarding (Services-\>Port Forwarding)
 * configure ip6 firewall (Services-\>Ipv6 firewall)
+* configure dhcp (Settings-\>LAN)
 
 # INSTALL
 
