@@ -293,7 +293,8 @@ func (r *StaticLeaseResource) createLeaseHelper(ctx context.Context, data Static
 		chromedp.ActionFunc(func(ctx context.Context) error {
 			time.Sleep(300 * time.Millisecond)
 			if r.client.AlertFound {
-				return fmt.Errorf("halting: router alert detected: %s", r.client.AlertMsg)
+				log.Printf("router alert: %s", r.client.AlertMsg)
+				return fmt.Errorf("halting: router alert: %s", r.client.AlertMsg)
 			}
 			return nil
 		}),

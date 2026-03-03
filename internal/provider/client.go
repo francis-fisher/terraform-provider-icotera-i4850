@@ -2,7 +2,9 @@ package provider
 
 import (
 	"context"
+	"fmt"
 	"github.com/chromedp/cdproto/page"
+	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
 	"sync"
 )
@@ -45,12 +47,24 @@ func (c *IcoteraClient) RunActions(ctx context.Context, actions ...chromedp.Acti
 	defer cancel()
 
 	chromedp.ListenTarget(taskCtx, func(ev interface{}) {
-		if ev, ok := ev.(*page.EventJavascriptDialogOpening); ok {
-			c.AlertMsg = ev.Message
+		switch e := ev.(type) {
+		// record alert dialogs, as some validation errors in the dhcp lease screen are reported through them
+		case *page.EventJavascriptDialogOpening:
+			c.AlertMsg = e.Message
 			c.AlertFound = true
 			go func() {
 				_ = chromedp.Run(taskCtx, page.HandleJavaScriptDialog(true))
 			}()
+
+		case *runtime.EventConsoleAPICalled:
+			for _, arg := range e.Args {
+				// Unquote handles the "double quoted" strings often returned by CDP
+				val := string(arg.Value)
+				fmt.Printf("[JS Console %s] %s\n", e.Type, val)
+			}
+
+		case *runtime.EventExceptionThrown:
+			fmt.Printf("[JS Exception] %s\n", e.ExceptionDetails.Text)
 		}
 	})
 

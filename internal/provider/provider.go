@@ -9,7 +9,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-type icoteraProvider struct{}
+type icoteraProvider struct {
+	version string
+}
 
 type icoteraProviderModel struct {
 	Endpoint types.String `tfsdk:"endpoint"`
@@ -25,6 +27,7 @@ func New() provider.Provider {
 
 func (p *icoteraProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
 	resp.TypeName = "icotera-i4850"
+	resp.Version = p.version
 }
 
 func (p *icoteraProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
@@ -65,6 +68,7 @@ func (p *icoteraProvider) Configure(ctx context.Context, req provider.ConfigureR
 func (p *icoteraProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		func() resource.Resource { return &StaticLeaseResource{} },
+		func() resource.Resource { return &PortForwardResource{} },
 		//        func() resource.Resource { return *DhcpResource{} },
 	}
 }
