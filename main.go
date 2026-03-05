@@ -5,12 +5,16 @@ import (
 	"log"
 
 	"github.com/hashicorp/terraform-plugin-framework/providerserver"
-	"github.com/wtfrank/terraform-provider-icotera-i4850/internal/provider"
+	"github.com/francis-fisher/terraform-provider-icotera-i4850/internal/provider"
+)
+
+var (
+    version string = "dev"
 )
 
 func main() {
 	opts := providerserver.ServeOpts{
-		Address: "hashicorp.com/wtfrank/icotera_i4850",
+		Address: "registry.terraform.io/francis-fisher/icotera_i4850",
 	}
 
 	err := providerserver.Serve(context.Background(), provider.New, opts)

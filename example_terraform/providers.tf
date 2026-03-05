@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     icotera = {
-      source  = "hashicorp.com/wtfrank/icotera-i4850"
+      source  = "registry.terraform.io/francis-fisher/icotera-i4850"
     }
   }
 }

@@ -1,4 +1,4 @@
-module github.com/wtfrank/terraform-provider-icotera-i4850
+module github.com/francis-fisher/terraform-provider-icotera-i4850
 
 go 1.25.7
 
