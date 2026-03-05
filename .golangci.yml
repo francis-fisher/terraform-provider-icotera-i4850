@@ -1,0 +1,14 @@
+# Copyright IBM Corp. 2026
+
+linters:
+  enable:
+    - errcheck    # Checks for unhandled errors
+    - staticcheck # General Go best practices
+    - revive      # Modern replacement for golint
+    - gocritic    # Provides diagnostics for bugs and performance
+    - gosec       # Inspects source code for security problems
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

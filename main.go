@@ -14,7 +14,7 @@ var (
 
 func main() {
 	opts := providerserver.ServeOpts{
-		Address: "registry.terraform.io/francis-fisher/icotera_i4850",
+		Address: "registry.terraform.io/francis-fisher/icotera-i4850",
 	}
 
 	err := providerserver.Serve(context.Background(), provider.New, opts)
@@ -23,3 +23,5 @@ func main() {
 		log.Fatal(err.Error())
 	}
 }
+
+//go:generate go run -modfile tools/go.mod github.com/golangci/golangci-lint/cmd/golangci-lint run ./...
