@@ -16,6 +16,7 @@ type IcoteraClient struct {
 	RouterAddress string
 	Username      string
 	Password      string
+	DeviceName    string     // this is captured during login process and may be useful if different variants of the i4850 have slightly different behaviour
 	lock          sync.Mutex // Critical for hardware with single-session UIs
 	AlertFound    bool       // some errors are reported by alerts so this needs to be passed back
 	AlertMsg      string
@@ -76,6 +77,7 @@ func (c *IcoteraClient) RunActions(ctx context.Context, actions ...chromedp.Acti
 	return chromedp.Run(taskCtx, append([]chromedp.Action{
 		chromedp.Navigate("https://" + c.RouterAddress + "/"),
 		chromedp.WaitVisible(`input[value="Log in"]`, chromedp.ByQuery),
+		chromedp.Text(`#global_header_devname`, &c.DeviceName, chromedp.ByID),
 		chromedp.SendKeys(`input[name="username"]`, c.Username),
 		chromedp.SendKeys(`input[name="password"]`, c.Password),
 		chromedp.Click(`input[value="Log in"]`, chromedp.ByQuery),
