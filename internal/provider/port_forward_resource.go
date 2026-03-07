@@ -405,9 +405,7 @@ func (r *portForwardResource) setRowValues(id string, plan portForwardResourceMo
 				return nil
 			}),
 
-			chromedp.Sleep(3*time.Second),
 			chromedp.SetValue(fmt.Sprintf("#I-HLP\\.portfwd\\.e_extport-%s\\.2", id), strconv.FormatInt(plan.ExternalPortStart.ValueInt64(), 10)),
-			chromedp.Sleep(3*time.Second),
 		)
 	} else {
 		actions = append(actions,
@@ -444,7 +442,7 @@ func (r *portForwardResource) syncCheckbox(elementID string, desired bool) chrom
 func (r *portForwardResource) navigatePortForwardActions() []chromedp.Action {
 	return []chromedp.Action{
 		chromedp.ActionFunc(func(_ context.Context) error {
-			log.Printf("[DEBUG] Navgating to port forward")
+			log.Printf("[DEBUG] Navigating to port forward")
 			return nil
 		}),
 		chromedp.WaitVisible(`#TREENODE_4`, chromedp.ByID),
