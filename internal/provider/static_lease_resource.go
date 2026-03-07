@@ -144,20 +144,11 @@ func (r *staticLeaseResource) Read(ctx context.Context, req resource.ReadRequest
     return { found: false };
 })("` + state.MacAddress.ValueString() + `")`
 
-	log.Printf("[INFO] Reading existing state")
-	err := r.client.RunActions(ctx,
-		chromedp.Click(`#TREENODE_0`, chromedp.ByID),
-		chromedp.WaitVisible(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
-		chromedp.Click(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
-		chromedp.Sleep(200*time.Millisecond),
-		chromedp.WaitVisible(`#BR\.1\.LEASES\.STATIC`, chromedp.ByID),
-		chromedp.WaitVisible(`#BRIDGE\.1\.STATICLEASES\.0\.INPUT`, chromedp.ByID),
-		chromedp.WaitVisible(`#HLP\.action\.newstaticlease\.ip`, chromedp.ByID),
-		// frontend seems to be quite slow to load the data into the table
-		chromedp.Sleep(500*time.Millisecond),
-
+	actions := append(r.navigateStaticLeaseActions(),
 		chromedp.Evaluate(jsExpression, &scrapedLease),
 	)
+
+	err := r.client.RunActions(ctx, actions...)
 	log.Printf("[DEBUG] READ RESULT - Found: %t, Host: %s, IP: %s",
 		scrapedLease.Found, scrapedLease.Hostname, scrapedLease.IP)
 
@@ -237,13 +228,7 @@ func (r *staticLeaseResource) deleteLeaseHelper(ctx context.Context, mac string)
             return false;
         })("` + mac + `")`
 
-	return r.client.RunActions(ctx,
-		chromedp.Click(`#TREENODE_0`, chromedp.ByID),
-		chromedp.WaitVisible(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
-		chromedp.Click(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
-		chromedp.Sleep(200*time.Millisecond),
-		chromedp.WaitVisible(`#BRIDGE\.1\.STATICLEASES\.0\.INPUT`, chromedp.ByID),
-		chromedp.Sleep(500*time.Millisecond),
+	actions := append(r.navigateStaticLeaseActions(),
 		chromedp.Evaluate(jsClickRemove, &EntryFound),
 		chromedp.Sleep(500*time.Millisecond),
 		chromedp.ActionFunc(func(_ context.Context) error {
@@ -254,6 +239,7 @@ func (r *staticLeaseResource) deleteLeaseHelper(ctx context.Context, mac string)
 			return fmt.Errorf("Existing lease not found")
 		}),
 		chromedp.WaitVisible(`#btn_apply`, chromedp.ByID),
+		chromedp.Sleep(200*time.Millisecond),
 		chromedp.Click(`#btn_apply`, chromedp.ByID),
 		chromedp.Sleep(200*time.Millisecond),
 		chromedp.ActionFunc(func(_ context.Context) error {
@@ -273,23 +259,19 @@ func (r *staticLeaseResource) deleteLeaseHelper(ctx context.Context, mac string)
 		chromedp.WaitNotVisible(`#content_overlay`, chromedp.ByID),
 		chromedp.WaitReady(`#BR\.1\.LEASES\.STATIC`, chromedp.ByID),
 	)
+
+	return r.client.RunActions(ctx, actions...)
 }
 
 func (r *staticLeaseResource) createLeaseHelper(ctx context.Context, data staticLeaseResourceModel) error {
 	var overlayText string
 	var hasErrorBox bool
 
-	actions := []chromedp.Action{
-		chromedp.Click(`#TREENODE_0`, chromedp.ByID),
-		chromedp.WaitVisible(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
-		chromedp.Click(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
-		chromedp.Sleep(200 * time.Millisecond),
-		chromedp.WaitVisible(`#BRIDGE\.1\.STATICLEASES\.0\.INPUT`, chromedp.ByID),
-
+	actions := append(r.navigateStaticLeaseActions(),
 		chromedp.SetValue(`#HLP\.action\.newstaticlease\.ip`, data.IPAddress.ValueString(), chromedp.ByID),
 		chromedp.SetValue(`#HLP\.action\.newstaticlease\.mac`, data.MacAddress.ValueString(), chromedp.ByID),
 		chromedp.SetValue(`#HLP\.action\.newstaticlease\.host`, data.Hostname.ValueString(), chromedp.ByID),
-	}
+	)
 
 	if !data.Enabled.IsNull() && data.Enabled.ValueBool() {
 		actions = append(actions, chromedp.SetAttributeValue(`#HLP\.action\.newstaticlease\.status`, "checked", "true", chromedp.ByID))
@@ -401,4 +383,22 @@ func (r *staticLeaseResource) createLeaseHelper(ctx context.Context, data static
 
 	log.Printf("[INFO] Router reported success: %s", overlayText)
 	return nil
+}
+
+func (r *staticLeaseResource) navigateStaticLeaseActions() []chromedp.Action {
+	return []chromedp.Action{
+		chromedp.ActionFunc(func(_ context.Context) error {
+			log.Printf("[DEBUG] Navigating to static lease page")
+			return nil
+		}),
+
+		chromedp.Click(`#TREENODE_0`, chromedp.ByID),
+		chromedp.WaitVisible(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
+		chromedp.Click(`li[data-nodeid="systemstatus.lan"] > a`, chromedp.ByQuery),
+		chromedp.Sleep(200 * time.Millisecond),
+		chromedp.WaitVisible(`#BR\.1\.LEASES\.STATIC`, chromedp.ByID),
+		chromedp.WaitVisible(`#BRIDGE\.1\.STATICLEASES\.0\.INPUT`, chromedp.ByID),
+		// Standardize the wait for data to populate
+		chromedp.Sleep(500 * time.Millisecond),
+	}
 }
