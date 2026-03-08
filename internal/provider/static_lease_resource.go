@@ -258,6 +258,7 @@ func (r *staticLeaseResource) deleteLeaseHelper(ctx context.Context, mac string)
 		chromedp.Click(`.C_CSS_flatbtn[value="Continue"]`, chromedp.ByQuery),
 		chromedp.WaitNotVisible(`#content_overlay`, chromedp.ByID),
 		chromedp.WaitReady(`#BR\.1\.LEASES\.STATIC`, chromedp.ByID),
+		chromedp.Sleep(200*time.Millisecond),
 	)
 
 	return r.client.RunActions(ctx, actions...)
@@ -280,11 +281,16 @@ func (r *staticLeaseResource) createLeaseHelper(ctx context.Context, data static
 	}
 
 	actions = append(actions,
+		chromedp.ActionFunc(func(_ context.Context) error {
+			log.Printf("[DEBUG] about to click Add")
+			return nil
+		}),
+
 		chromedp.Click(`tr#BRIDGE\.1\.STATICLEASES\.0\.INPUT input[value="Add"]`, chromedp.ByQuery),
 
 		// Router may refuse the entry via an alert box if there's an existing entry
+		chromedp.Sleep(500*time.Millisecond),
 		chromedp.ActionFunc(func(_ context.Context) error {
-			time.Sleep(300 * time.Millisecond)
 			if r.client.AlertFound {
 				log.Printf("router alert: %s", r.client.AlertMsg)
 				return fmt.Errorf("halting: router alert: %s", r.client.AlertMsg)
@@ -292,13 +298,19 @@ func (r *staticLeaseResource) createLeaseHelper(ctx context.Context, data static
 			return nil
 		}),
 
-		chromedp.Sleep(200*time.Millisecond),
 		chromedp.WaitVisible(`#btn_apply`, chromedp.ByID),
+		chromedp.Sleep(500*time.Millisecond),
+		chromedp.ActionFunc(func(_ context.Context) error {
+			log.Printf("[DEBUG] about to click Apply")
+			return nil
+		}),
+
 		chromedp.Click(`#btn_apply`, chromedp.ByID),
 
 		chromedp.WaitVisible(`#content_overlay_panel`, chromedp.ByID),
 		chromedp.Evaluate(`document.querySelector('.C_CSS_MsgReportBox') !== null`, &hasErrorBox),
 		chromedp.Text(`#content_overlay_content`, &overlayText, chromedp.ByID),
+		chromedp.Sleep(500*time.Millisecond),
 
 		// Router may refuse the config if it doesn't like the IP address
 		chromedp.ActionFunc(func(ctx context.Context) error {
@@ -368,7 +380,10 @@ func (r *staticLeaseResource) createLeaseHelper(ctx context.Context, data static
 			}
 
 			log.Printf("[DEBUG] Waiting for page to reload")
-			return chromedp.WaitNotVisible(`#content_overlay`, chromedp.ByID).Do(ctx)
+			if err := chromedp.WaitNotVisible(`#content_overlay`, chromedp.ByID).Do(ctx); err != nil {
+				return err
+			}
+			return chromedp.Sleep(300 * time.Millisecond).Do(ctx)
 		}),
 	)
 
@@ -399,6 +414,8 @@ func (r *staticLeaseResource) navigateStaticLeaseActions() []chromedp.Action {
 		chromedp.WaitVisible(`#BR\.1\.LEASES\.STATIC`, chromedp.ByID),
 		chromedp.WaitVisible(`#BRIDGE\.1\.STATICLEASES\.0\.INPUT`, chromedp.ByID),
 		// Standardize the wait for data to populate
+		chromedp.Sleep(500 * time.Millisecond),
+		chromedp.WaitVisible(`input[value="Add"]`, chromedp.ByQuery),
 		chromedp.Sleep(500 * time.Millisecond),
 	}
 }
