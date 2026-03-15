@@ -16,17 +16,21 @@ Tested with chromium on ubuntu 24.04
 
 # IMPORTING INTO TERRAFORM
 
-static lease uses the mac address as a key
+Static lease uses the mac address as a key
 
 `terraform import icotera-i4850\_static\_lease.example 00:11:22:33:44:55`
 
-port forward uses the row number as a key
+Port forward uses the row number as a key
 
 `terraform import icotera-i4850\_port\_forward.example1 128`
 
-the ipv6 firewal also uses the row number as a key
+The ipv6 firewall also uses the row number as a key
 
 `terraform import icotera-i4850\_ipv6\_firewall.example2 32`
+
+The LAN Settings resource uses a fixed id of "lan.settings"
+
+`terraform import icotera-i4850\_lan\_settings.example\_lan\_settings lan.settings`
 
 # DEBUG TIPS
 

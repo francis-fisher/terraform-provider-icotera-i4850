@@ -18,6 +18,4 @@ resource "icotera-i4850_ipv6_firewall" "example2" {
 # source_ip and source_prefix_length can be omitted
   source_ip = "::"
   source_prefix_length = 128
-
 }
-
