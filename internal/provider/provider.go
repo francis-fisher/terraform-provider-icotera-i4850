@@ -90,5 +90,6 @@ func (p *icoteraProvider) Resources(_ context.Context) []func() resource.Resourc
 		func() resource.Resource { return &staticLeaseResource{} },
 		func() resource.Resource { return &portForwardResource{} },
 		func() resource.Resource { return &iPv6FirewallResource{} },
+		func() resource.Resource { return &lanSettingsResource{} },
 	}
 }
