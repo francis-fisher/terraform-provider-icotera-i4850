@@ -23,7 +23,6 @@ resource "icotera-i4850_ipv6_firewall" "example2" {
   name = "example2"
   protocol = "tcp" # can be "tcp", "udp", or "any"
   port_start = 555
-
   port_end = 555 # port_end can be omitted for a single port range
 
 
@@ -32,18 +31,14 @@ resource "icotera-i4850_ipv6_firewall" "example2" {
 # globally-routable address based on the prefix assigned
 # by the isp, rather than a link-local address.
 # Stable-privacy addresses may be preferred to EUI-64.
-
   destination_ip = "2001:db8::ff00:42:8329"
 
 # a prefix length of 128 bits means an exact match against the provided address
-
   destination_prefix_length = 128
 
 # source_ip and source_prefix_length can be omitted
-
   source_ip = "::"
   source_prefix_length = 128
-
 }
 ```
 
@@ -67,3 +62,14 @@ resource "icotera-i4850_ipv6_firewall" "example2" {
 ### Read-Only
 
 - `id` (String) The 1-32 slot index on the router.
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+# The IPv6 firewall uses the row number in the web UI as the ID
+terraform import icotera-i4850_ipv6_firewall.example2 32
+```

@@ -52,3 +52,14 @@ resource "icotera-i4850_port_forward" "example1" {
 ### Read-Only
 
 - `id` (String) The 1-128 slot index on the router.
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+# Port forward uses the row number from the web UI as the ID
+terraform import icotera-i4850_port_forward.example1 128
+```

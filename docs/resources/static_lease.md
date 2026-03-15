@@ -4,14 +4,14 @@ page_title: "icotera-i4850_static_lease Resource - Icotera i4850"
 subcategory: ""
 description: |-
   Static DHCP Leases (IPv4)
-  Allocate consistent IPv4 addresses to devices inside the network. Devices are identified by MAC address. Assigned addresses must be within the range of addresses defined by the IP address and netmask configured at Settings->LAN on the router webpage.
+  Allocate consistent IPv4 addresses to devices inside the network. Devices are identified by MAC address. Assigned addresses must be within the range of addresses defined by the IP address and netmask configured via the icotera-i4850_lan_settings resource or at Settings->LAN on the router webpage.
 ---
 
 # icotera-i4850_static_lease (Resource)
 
 Static DHCP Leases (IPv4)
 
-Allocate consistent IPv4 addresses to devices inside the network. Devices are identified by MAC address. Assigned addresses must be within the range of addresses defined by the IP address and netmask configured at Settings->LAN on the router webpage.
+Allocate consistent IPv4 addresses to devices inside the network. Devices are identified by MAC address. Assigned addresses must be within the range of addresses defined by the IP address and netmask configured via the icotera-i4850_lan_settings resource or at Settings->LAN on the router webpage.
 
 ## Example Usage
 
@@ -41,3 +41,14 @@ resource "icotera-i4850_static_lease" "example" {
 ### Read-Only
 
 - `id` (String) The ID of the entry (mac address)
+
+## Import
+
+Import is supported using the following syntax:
+
+The [`terraform import` command](https://developer.hashicorp.com/terraform/cli/commands/import) can be used, for example:
+
+```shell
+# The static lease resource uses the MAC address as the ID
+terraform import icotera-i4850_static_lease.example 00:11:22:33:44:55
+```
